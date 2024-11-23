@@ -2,13 +2,16 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.ftc.LazyImu;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -31,22 +34,22 @@ public class SampleTeleOp extends LinearOpMode {
     double imuDifference = 0;
     double imuWrap = 0;
     private List<Action> runningActions = new ArrayList<>();
+    public LazyImu lazyImu;
+    public static org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive.Params PARAMS = new org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive.Params();
 
     //start of opmode, inside this function will be your main while loop and initialize all hardware objects
     @Override
     public void runOpMode() {
 
-        //IMU intialization, you will need to change this to  match your imu
-            imu = hardwareMap.get(AdafruitBNO055IMU.class, "imu");
-            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-            parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-            imu.initialize(parameters);
+        lazyImu = new LazyImu(hardwareMap, "imu", new RevHubOrientationOnRobot(
+                PARAMS.logoFacingDirection, PARAMS.usbFacingDirection));
+
 
         //initialize motors, you will need to change these parameters to match your motor setup and names.
-            Motor leftFront = new Motor(hardwareMap, "leftFront", Motor.GoBILDA.RPM_312);
-            Motor rightFront = new Motor(hardwareMap, "rightFront", Motor.GoBILDA.RPM_312);
-            Motor leftBack = new Motor(hardwareMap, "leftBack", Motor.GoBILDA.RPM_312);
-            Motor rightBack = new Motor(hardwareMap, "rightBack", Motor.GoBILDA.RPM_312);
+            Motor leftFront = new Motor(hardwareMap, "frontLeft");
+            Motor rightFront = new Motor(hardwareMap, "frontRight");
+            Motor leftBack = new Motor(hardwareMap, "backLeft");
+            Motor rightBack = new Motor(hardwareMap, "backRight");
 
         //change the braking behavior, this is mostly personal preference but I recommend leaving this unchanged.
             leftFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
@@ -55,7 +58,7 @@ public class SampleTeleOp extends LinearOpMode {
             rightBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         //reverse motors
             leftFront.setInverted(true);
-            leftBack.setInverted(true);
+            rightFront.setInverted(true);
 
         //initialize our mecanum drive from ftclib
             com.arcrobotics.ftclib.drivebase.MecanumDrive drive = new MecanumDrive(
@@ -77,7 +80,7 @@ public class SampleTeleOp extends LinearOpMode {
             Mechanisms.Lift lift = new Mechanisms.Lift(hardwareMap);
 
         //intialize intake motor from our mechanisms file
-            Mechanisms.Intake intake = new Mechanisms.Intake(hardwareMap);
+            //Mechanisms.Intake intake = new Mechanisms.Intake(hardwareMap);
 
 
         //wait for the driver station to start
@@ -132,7 +135,7 @@ public class SampleTeleOp extends LinearOpMode {
 
             //example of intake control
                 //use an if else statement first so that theres a tolerance before it starts moving the motor
-                    if(driver1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1) {
+                    /*if(driver1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1) {
                             //call the spin intake forward function
                         runningActions.add(new SequentialAction(
                                 intake.spinForward()
@@ -143,13 +146,13 @@ public class SampleTeleOp extends LinearOpMode {
                         runningActions.add(new SequentialAction(
                                 intake.spinBackward()
                         ));
-                        }
+                        }*/
 
 
             /*Code to automatically reset the imu to the last known setting if it gets reset because of static.
             I highly recommend leaving this unchanged unless you know what you're doing*/
 
-            //get imu value as a variable
+           /* //get imu value as a variable
                 imuValue = imu.getAngularOrientation().firstAngle + imuDifference;
             //find difference between current and previous values, wrapped around 360
                 imuWrap = prevImuValue - imuValue;
@@ -172,7 +175,7 @@ public class SampleTeleOp extends LinearOpMode {
                     imuValue = 0;
                     prevImuValue = 0;
                     imuDifference = 0;
-                }
+                }*/
 
             /*call our mecanum drive function from ftclib using field centric control,
             if you want robotcentric, change "Field" to "Robot" and remove the imuValue variable,
@@ -181,7 +184,8 @@ public class SampleTeleOp extends LinearOpMode {
                         driver1.getLeftX(),
                         driver1.getLeftY(),
                         driver1.getRightX(),
-                        imuValue,
+                        lazyImu.get().getRobotYawPitchRollAngles().getYaw()
+                        ,
                         true
                     );
         }

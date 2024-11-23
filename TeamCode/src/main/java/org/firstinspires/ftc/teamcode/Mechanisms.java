@@ -55,7 +55,7 @@ public class Mechanisms {
 
         public Lift(HardwareMap hardwareMap) {
             //initialize our lift from hardwareMap
-            lift = new Motor(hardwareMap, "lift", Motor.GoBILDA.RPM_30);
+            lift = new Motor(hardwareMap, "arm");
             //set the braking mode to brake when theres no power given so it better holds target position
             lift.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
             //put it into position control so it automatically flips direction
