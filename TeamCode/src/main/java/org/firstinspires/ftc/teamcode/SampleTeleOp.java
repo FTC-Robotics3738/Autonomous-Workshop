@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //Call the teleop so it shows up on the driver station
-@TeleOp(name = "SAMPLE_TELEOP", group = "TeleOp")
+@TeleOp(name = "PrimaryTeleOp", group = "TeleOp")
 public class SampleTeleOp extends LinearOpMode {
     //can have variables and define hardware objects here, anything from here to "waitForStart();" will run in initialization.
 
@@ -46,19 +46,22 @@ public class SampleTeleOp extends LinearOpMode {
 
 
         //initialize motors, you will need to change these parameters to match your motor setup and names.
-            Motor leftFront = new Motor(hardwareMap, "frontLeft");
-            Motor rightFront = new Motor(hardwareMap, "frontRight");
-            Motor leftBack = new Motor(hardwareMap, "backLeft");
-            Motor rightBack = new Motor(hardwareMap, "backRight");
+        Motor leftFront = new Motor(hardwareMap, "frontLeft");
+        Motor rightFront = new Motor(hardwareMap, "frontRight");
+        Motor leftBack = new Motor(hardwareMap, "backLeft");
+        Motor rightBack = new Motor(hardwareMap, "backRight");
+//        Motor leftArm = new Motor(hardwareMap, "armLeft");
+//        Motor rightArm = new Motor(hardwareMap, "armRight");
+
+        leftFront.setInverted(true);
+        rightFront.setInverted(true);
+        //left/rightArm.setInverted(true);
 
         //change the braking behavior, this is mostly personal preference but I recommend leaving this unchanged.
             leftFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
             rightFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
             leftBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
             rightBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        //reverse motors
-            leftFront.setInverted(true);
-            rightFront.setInverted(true);
 
         //initialize our mecanum drive from ftclib
             com.arcrobotics.ftclib.drivebase.MecanumDrive drive = new MecanumDrive(
@@ -122,12 +125,12 @@ public class SampleTeleOp extends LinearOpMode {
 
             //example of lift control
                 //can use .wasJustPressed because the lift target position only needs to change once.
-                    if(driver1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    if(driver1.wasJustPressed(GamepadKeys.Button.X)) {
                         runningActions.add(new SequentialAction(
                                 lift.liftUp()
-                        ));
+                        )); 
                         }
-                    else if (driver1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+                    else if (driver1.wasJustPressed(GamepadKeys.Button.Y)) {
                         runningActions.add(new SequentialAction(
                                 lift.liftDown()
                         ));

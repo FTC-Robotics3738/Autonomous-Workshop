@@ -8,7 +8,7 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class Mechanisms {
+public class  Mechanisms {
     //class to create a claw
     public static class Claw {
         private Servo claw;
@@ -50,20 +50,32 @@ public class Mechanisms {
 
     //lift class (this will require an encoder plugged into the motor)
     public static class Lift {
-        private Motor lift;
+        private Motor leftArm;
+        private Motor rightArm;
         //create lift from hardwaremap and initialize it
 
         public Lift(HardwareMap hardwareMap) {
             //initialize our lift from hardwareMap
-            lift = new Motor(hardwareMap, "arm");
+            leftArm = new Motor(hardwareMap, "armLeft");
             //set the braking mode to brake when theres no power given so it better holds target position
-            lift.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+            leftArm.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
             //put it into position control so it automatically flips direction
-            lift.setRunMode(Motor.RunMode.PositionControl);
+            leftArm.setRunMode(Motor.RunMode.PositionControl);
             //set the lift motor direction
-            lift.setInverted(true);
+            leftArm.setInverted(true);
             //set position coefficient of the lift, (p value)
-            lift.setPositionCoefficient(0.001);
+            leftArm.setPositionCoefficient(0.001);
+
+
+            rightArm = new Motor(hardwareMap, "armLeft");
+            //set the braking mode to brake when theres no power given so it better holds target position
+            rightArm.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+            //put it into position control so it automatically flips direction
+            rightArm.setRunMode(Motor.RunMode.PositionControl);
+            //set the lift motor direction
+            rightArm.setInverted(true);
+            //set position coefficient of the lift, (p value)
+            rightArm.setPositionCoefficient(0.001);
         }
 
         public class LiftUp implements Action {
@@ -75,17 +87,17 @@ public class Mechanisms {
             public boolean run(@NonNull TelemetryPacket packet) {
                 // powers on motor, if it is not on
                 if (!initialized) {
-                    lift.set(0.8);
+                    leftArm.set(0.8);
                     initialized = true;
                 }
                 //set the target position of the lift to 3000 ticks
-                lift.setTargetPosition(3000);
-                if (!lift.atTargetPosition()) {
+                leftArm.setTargetPosition(3000);
+                if (!leftArm.atTargetPosition()) {
                     // true causes the action to rerun
                     return true;
                 } else {
                     // false stops action rerun and stops the lift
-                    lift.set(0);
+                    leftArm.set(0);
                     return false;
                 }
                 // overall, the action powers the lift until it surpasses
@@ -104,20 +116,20 @@ public class Mechanisms {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 //set the lifts target position to down position
-                lift.setTargetPosition(10);
+                leftArm.setTargetPosition(10);
                 // powers on motor, if it is not on
                 if (!initialized) {
-                    lift.set(-0.8);
+                    leftArm.set(-0.8);
                     initialized = true;
                 }
 
                 //if the lift isn't at the target position then repeat the loop
-                if (!lift.atTargetPosition()) {
+                if (!leftArm.atTargetPosition()) {
                     // true causes the action to rerun
                     return true;
                 } else {
                     // false stops action rerun and stops the lift
-                    lift.set(0);
+                    leftArm.set(0);
                     return false;
                 }
                 // overall, the action powers the lift down until it goes below
