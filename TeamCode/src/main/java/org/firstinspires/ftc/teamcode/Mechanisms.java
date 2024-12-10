@@ -62,12 +62,13 @@ public class  Mechanisms {
             //put it into position control so it automatically flips direction
             leftArm.setRunMode(Motor.RunMode.PositionControl);
             //set the lift motor direction
-            leftArm.setInverted(true);
+            //leftArm.setInverted(true);
             //set position coefficient of the lift, (p value)
             leftArm.setPositionCoefficient(0.001);
+            leftArm.resetEncoder();
 
 
-            rightArm = new Motor(hardwareMap, "armLeft");
+            rightArm = new Motor(hardwareMap, "armRight");
             //set the braking mode to brake when theres no power given so it better holds target position
             rightArm.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
             //put it into position control so it automatically flips direction
@@ -91,8 +92,8 @@ public class  Mechanisms {
                     initialized = true;
                 }
                 //set the target position of the lift to 3000 ticks
-                leftArm.setTargetPosition(3000);
-                if (!leftArm.atTargetPosition()) {
+                leftArm.setTargetPosition(1000);
+                if (leftArm.getCurrentPosition() <= 1000) {
                     // true causes the action to rerun
                     return true;
                 } else {
@@ -116,15 +117,15 @@ public class  Mechanisms {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 //set the lifts target position to down position
-                leftArm.setTargetPosition(10);
+                leftArm.setTargetPosition(300);
                 // powers on motor, if it is not on
                 if (!initialized) {
-                    leftArm.set(-0.8);
+                    leftArm.set(0.2);
                     initialized = true;
                 }
 
                 //if the lift isn't at the target position then repeat the loop
-                if (!leftArm.atTargetPosition()) {
+                if (leftArm.getCurrentPosition() >= 300) {
                     // true causes the action to rerun
                     return true;
                 } else {

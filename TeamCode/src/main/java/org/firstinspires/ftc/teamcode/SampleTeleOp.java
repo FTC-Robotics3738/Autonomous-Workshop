@@ -125,12 +125,12 @@ public class SampleTeleOp extends LinearOpMode {
 
             //example of lift control
                 //can use .wasJustPressed because the lift target position only needs to change once.
-                    if(driver1.wasJustPressed(GamepadKeys.Button.X)) {
+                    if(driver1.getButton(GamepadKeys.Button.X)) {
                         runningActions.add(new SequentialAction(
                                 lift.liftUp()
                         )); 
                         }
-                    else if (driver1.wasJustPressed(GamepadKeys.Button.Y)) {
+                    else if (driver1.getButton(GamepadKeys.Button.Y)) {
                         runningActions.add(new SequentialAction(
                                 lift.liftDown()
                         ));
